@@ -1,3 +1,4 @@
+
 # Santa Clara ECO — Admin Dashboard
 
 Painel de gestão interno para gerenciar os agendamentos recebidos pelo [site público da Santa Clara ECO](https://github.com/SEU_USUARIO/Site_Limpa_Fossa).
