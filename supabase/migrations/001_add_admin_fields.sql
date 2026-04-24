@@ -28,9 +28,6 @@ CREATE INDEX IF NOT EXISTS idx_appointments_status
 CREATE INDEX IF NOT EXISTS idx_appointments_data_hora
   ON appointments(data_hora);
 
-CREATE INDEX IF NOT EXISTS idx_appointments_criado_em
-  ON appointments(criado_em DESC);
-
 -- 3. Trigger para manter `atualizado_em` automaticamente
 CREATE OR REPLACE FUNCTION update_atualizado_em_column()
 RETURNS TRIGGER AS $$
