@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 
 // -----------------------------------------------------------------------
-// Mocks must be declared before imports that reference them.
-// We mock the supabase module so no real network calls are made.
+// vi.hoisted ensures these are available when vi.mock factory runs
 // -----------------------------------------------------------------------
-const mockOrder = vi.fn()
-const mockSelect = vi.fn(() => ({ order: mockOrder }))
-const mockFrom = vi.fn(() => ({ select: mockSelect }))
+const { mockOrder, mockSelect, mockFrom } = vi.hoisted(() => {
+  const mockOrder = vi.fn()
+  const mockSelect = vi.fn(() => ({ order: mockOrder }))
+  const mockFrom = vi.fn(() => ({ select: mockSelect }))
+  return { mockOrder, mockSelect, mockFrom }
+})
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {
@@ -49,6 +51,9 @@ function makeAppointment(overrides: Partial<Appointment> = {}): Appointment {
 describe('fetchAppointments', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Restore chain after clearAllMocks resets return values
+    mockSelect.mockReturnValue({ order: mockOrder })
+    mockFrom.mockReturnValue({ select: mockSelect })
   })
 
   it('calls supabase.from("appointments").select("*").order("data_hora", { ascending: true })', async () => {
@@ -87,6 +92,8 @@ describe('fetchAppointments', () => {
 describe('useAppointments', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSelect.mockReturnValue({ order: mockOrder })
+    mockFrom.mockReturnValue({ select: mockSelect })
   })
 
   it('starts with isLoading=true and empty filteredData', () => {
@@ -212,9 +219,7 @@ describe('useAppointments', () => {
   })
 
   it('dateFrom filter uses Date comparison (not string)', async () => {
-    // data_hora is future (2026-07-01)
     const future = makeAppointment({ id: '1', data_hora: '2026-07-01T10:00:00.000Z' })
-    // data_hora is past relative to filter (2026-05-01)
     const past = makeAppointment({ id: '2', data_hora: '2026-05-01T10:00:00.000Z' })
     mockOrder.mockResolvedValueOnce({ data: [future, past], error: null })
 
