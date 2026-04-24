@@ -69,14 +69,8 @@ export function MobileHeader() {
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.4 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                enter: { duration: 0.25, ease: 'easeOut' },
-                exit: { duration: 0.2, ease: 'easeIn' },
-                duration: 0.25,
-                ease: 'easeOut',
-              }}
+              animate={{ opacity: 0.4, transition: { duration: 0.25, ease: 'easeOut' } }}
+              exit={{ opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } }}
               className="fixed inset-0 bg-black z-40"
               onClick={closeDrawer}
               aria-hidden="true"
