@@ -27,7 +27,7 @@ export function AppointmentCard({ appointment: a }: AppointmentCardProps) {
         {/* Row 3: Data/Hora */}
         <div className="flex items-center gap-1.5 text-xs text-zinc-500">
           <Calendar className="h-3.5 w-3.5 shrink-0" />
-          <span>{format(parseISO(a.data_hora), 'dd/MM/yyyy HH:mm')}</span>
+          <span>{a.data_hora ? format(parseISO(a.data_hora), 'dd/MM/yyyy HH:mm') : '—'}</span>
         </div>
 
         {/* Row 4: WhatsApp */}

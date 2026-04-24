@@ -55,13 +55,13 @@ export function AppointmentsTable({ data }: AppointmentsTableProps) {
               </td>
               <td className="px-4 py-3 text-sm text-zinc-700">{a.servico}</td>
               <td className="px-4 py-3 text-sm text-zinc-700">
-                {format(parseISO(a.data_hora), 'dd/MM/yyyy HH:mm')}
+                {a.data_hora ? format(parseISO(a.data_hora), 'dd/MM/yyyy HH:mm') : '—'}
               </td>
               <td className="px-4 py-3">
                 <StatusBadge appointment={a} />
               </td>
               <td className="px-4 py-3 text-sm text-zinc-700">
-                {format(parseISO(a.criado_em), 'dd/MM/yyyy')}
+                {a.criado_em ? format(parseISO(a.criado_em), 'dd/MM/yyyy') : '—'}
               </td>
             </tr>
           ))}

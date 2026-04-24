@@ -51,7 +51,11 @@ export function StatusBadge({ appointment }: StatusBadgeProps) {
     )
   }
 
-  const config = STATUS_MAP[appointment.status]
+  const config = STATUS_MAP[appointment.status] ?? {
+    label: appointment.status ?? 'Desconhecido',
+    className: 'bg-zinc-100 text-zinc-500',
+    ariaLabel: `Status: ${appointment.status ?? 'desconhecido'}`,
+  }
 
   return (
     <span
