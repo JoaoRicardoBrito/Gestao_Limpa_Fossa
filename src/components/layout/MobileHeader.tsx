@@ -5,6 +5,7 @@ import { Menu, X, LayoutDashboard, CalendarDays, LogOut } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
+import logo from '@/assets/WhatsApp Image 2026-04-10 at 12.13.48.jpeg'
 
 interface NavItem {
   label: string
@@ -51,11 +52,9 @@ export function MobileHeader() {
           <Menu className="h-6 w-6" />
         </button>
 
-        {/* Center: app name */}
+        {/* Center: logo */}
         <div className="flex-1 flex justify-center">
-          <span className="text-sm font-semibold text-zinc-900">
-            Santa Clara ECO
-          </span>
+          <img src={logo} alt="Santa Clara ECO" className="h-8 w-auto object-contain" />
         </div>
 
         {/* Right: reserved — empty in Phase 1 */}
@@ -90,9 +89,7 @@ export function MobileHeader() {
             >
               {/* Drawer header with close button */}
               <div className="h-14 flex items-center justify-between px-4 shrink-0">
-                <span className="text-sm font-semibold text-zinc-900">
-                  Santa Clara ECO
-                </span>
+                <img src={logo} alt="Santa Clara ECO" className="h-8 w-auto object-contain" />
                 {/* X close button — 44x44 touch target */}
                 <button
                   onClick={closeDrawer}
