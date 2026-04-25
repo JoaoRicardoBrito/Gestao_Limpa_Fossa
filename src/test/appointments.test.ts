@@ -351,4 +351,89 @@ describe('useAppointments', () => {
     // serviceOptions should still have both services (from rawData), sorted, deduped
     expect(result.current.serviceOptions).toEqual(['Desentupimento', 'Limpeza de fossa'])
   })
+
+  it('updateStatus passes motivo to updateAppointmentStatus service', async () => {
+    const appointment = makeAppointment({ id: '1', status: 'pendente' })
+    mockOrder.mockResolvedValueOnce({ data: [appointment], error: null })
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    const { result } = renderHook(() => useAppointments())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    await result.current.updateStatus('1', 'cancelado', 'motivo teste')
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ motivo_cancelamento: 'motivo teste' })
+    )
+  })
+
+  it('hook return object includes saveNotes property', async () => {
+    mockOrder.mockResolvedValueOnce({ data: [], error: null })
+
+    const { result } = renderHook(() => useAppointments())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(result.current).toHaveProperty('saveNotes')
+    expect(typeof result.current.saveNotes).toBe('function')
+  })
+
+  it('saveNotes applies optimistic update to rawData immediately', async () => {
+    const appointment = makeAppointment({ id: '1', notas: null })
+    mockOrder.mockResolvedValueOnce({ data: [appointment], error: null })
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    const { result } = renderHook(() => useAppointments())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    await result.current.saveNotes('1', 'nova nota')
+
+    await waitFor(() =>
+      expect(result.current.filteredData[0].notas).toBe('nova nota')
+    )
+  })
+
+  it('saveNotes calls saveAppointmentNotes service', async () => {
+    const appointment = makeAppointment({ id: '1' })
+    mockOrder.mockResolvedValueOnce({ data: [appointment], error: null })
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    const { result } = renderHook(() => useAppointments())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    await result.current.saveNotes('1', 'texto')
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ notas: 'texto' })
+    )
+  })
+
+  it('saveNotes returns { error: null } on success', async () => {
+    const appointment = makeAppointment({ id: '1' })
+    mockOrder.mockResolvedValueOnce({ data: [appointment], error: null })
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    const { result } = renderHook(() => useAppointments())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    const { error } = await result.current.saveNotes('1', 'texto')
+
+    expect(error).toBeNull()
+  })
+
+  it('saveNotes reverts rawData via refetch when service returns error', async () => {
+    const appointment = makeAppointment({ id: '1', notas: 'original' })
+    const refetched = makeAppointment({ id: '1', notas: 'original' })
+    mockOrder.mockResolvedValueOnce({ data: [appointment], error: null })
+    mockEq.mockResolvedValueOnce({ error: { message: 'fail' } })
+    mockOrder.mockResolvedValueOnce({ data: [refetched], error: null })
+
+    const { result } = renderHook(() => useAppointments())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    await result.current.saveNotes('1', 'nova nota errada')
+
+    await waitFor(() =>
+      expect(result.current.filteredData[0].notas).toBe('original')
+    )
+  })
 })
