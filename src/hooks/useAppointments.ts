@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import { fetchAppointments, updateAppointmentStatus } from '@/services/appointments'
+import { fetchAppointments, updateAppointmentStatus, saveAppointmentNotes } from '@/services/appointments'
 import type { Appointment, AppointmentStatus } from '@/types'
 
 export type TabFilter = AppointmentStatus | 'todos'
@@ -66,16 +66,27 @@ export function useAppointments() {
     [rawData]
   )
 
-  const updateStatus = useCallback(async (id: string, status: AppointmentStatus) => {
+  const updateStatus = useCallback(async (id: string, status: AppointmentStatus, motivo?: string) => {
     // Optimistic update
     setRawData(prev => prev.map(a => a.id === id ? { ...a, status } : a))
-    const { error } = await updateAppointmentStatus(id, status)
+    const { error } = await updateAppointmentStatus(id, status, motivo)
     if (error) {
       // Revert on failure by refetching
       fetchAppointments().then(({ data }) => {
         if (data) setRawData(data)
       })
     }
+  }, [])
+
+  const saveNotes = useCallback(async (id: string, notas: string) => {
+    setRawData(prev => prev.map(a => a.id === id ? { ...a, notas } : a))
+    const { error } = await saveAppointmentNotes(id, notas)
+    if (error) {
+      fetchAppointments().then(({ data }) => {
+        if (data) setRawData(data)
+      })
+    }
+    return { error }
   }, [])
 
   return {
@@ -86,5 +97,6 @@ export function useAppointments() {
     filters,
     setFilters,
     updateStatus,
+    saveNotes,
   }
 }
