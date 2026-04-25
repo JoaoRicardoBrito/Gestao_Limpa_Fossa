@@ -116,7 +116,7 @@ describe('updateAppointmentStatus', () => {
 
     await updateAppointmentStatus('id1', 'cancelado')
 
-    const updateArg = mockUpdate.mock.calls[0][0] as Record<string, unknown>
+    const updateArg = (mockUpdate.mock.calls as unknown as [Record<string, unknown>][])[0][0]
     expect(updateArg).not.toHaveProperty('motivo_cancelamento')
   })
 
@@ -125,7 +125,7 @@ describe('updateAppointmentStatus', () => {
 
     await updateAppointmentStatus('id1', 'concluido')
 
-    const updateArg = mockUpdate.mock.calls[0][0] as Record<string, unknown>
+    const updateArg = (mockUpdate.mock.calls as unknown as [Record<string, unknown>][])[0][0]
     expect(updateArg).toHaveProperty('concluido_em')
     expect(updateArg).not.toHaveProperty('motivo_cancelamento')
   })
