@@ -20,14 +20,15 @@ export async function fetchAppointments(): Promise<FetchAppointmentsResult> {
 
 export async function updateAppointmentStatus(
   id: string,
-  status: AppointmentStatus
+  status: AppointmentStatus,
+  motivo?: string
 ): Promise<{ error: string | null }> {
   const now = new Date().toISOString()
   const extra =
     status === 'concluido'
       ? { concluido_em: now }
       : status === 'cancelado'
-        ? { cancelado_em: now }
+        ? { cancelado_em: now, ...(motivo ? { motivo_cancelamento: motivo } : {}) }
         : {}
 
   const { error } = await supabase
@@ -36,4 +37,15 @@ export async function updateAppointmentStatus(
     .eq('id', id)
 
   return { error: error ? 'Erro ao atualizar status.' : null }
+}
+
+export async function saveAppointmentNotes(
+  id: string,
+  notas: string
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('appointments')
+    .update({ notas, atualizado_em: new Date().toISOString() })
+    .eq('id', id)
+  return { error: error ? 'Erro ao salvar nota.' : null }
 }
