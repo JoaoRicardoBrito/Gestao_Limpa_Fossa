@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select'
 
 interface AppointmentsFiltersProps {
+  clearKey?: number
   search: string
   servico: string
   dateFrom: string
@@ -23,6 +24,7 @@ interface AppointmentsFiltersProps {
 }
 
 export function AppointmentsFilters({
+  clearKey = 0,
   search,
   servico,
   dateFrom,
@@ -68,6 +70,7 @@ export function AppointmentsFilters({
 
       {/* Date From */}
       <Input
+        key={`dateFrom-${clearKey}`}
         type="date"
         value={dateFrom}
         onChange={(e) => onDateFromChange(e.target.value)}
@@ -76,6 +79,7 @@ export function AppointmentsFilters({
 
       {/* Date To */}
       <Input
+        key={`dateTo-${clearKey}`}
         type="date"
         value={dateTo}
         onChange={(e) => onDateToChange(e.target.value)}

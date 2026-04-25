@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useAppointments } from '@/hooks/useAppointments'
 import { AppointmentsTabs } from '@/components/appointments/AppointmentsTabs'
 import { AppointmentsFilters } from '@/components/appointments/AppointmentsFilters'
@@ -8,6 +9,7 @@ import { SkeletonCard } from '@/components/appointments/SkeletonCard'
 import { EmptyState } from '@/components/appointments/EmptyState'
 
 export function AppointmentsPage() {
+  const [clearKey, setClearKey] = useState(0)
   const {
     filteredData,
     serviceOptions,
@@ -28,6 +30,7 @@ export function AppointmentsPage() {
       <h1 className="text-xl font-semibold text-zinc-900">Agendamentos</h1>
 
       <AppointmentsFilters
+        clearKey={clearKey}
         search={filters.search}
         servico={filters.servico}
         dateFrom={filters.dateFrom}
@@ -37,7 +40,7 @@ export function AppointmentsPage() {
         onServicoChange={v => setFilters(prev => ({ ...prev, servico: v }))}
         onDateFromChange={v => setFilters(prev => ({ ...prev, dateFrom: v }))}
         onDateToChange={v => setFilters(prev => ({ ...prev, dateTo: v }))}
-        onClear={() =>
+        onClear={() => {
           setFilters(prev => ({
             ...prev,
             search: '',
@@ -45,7 +48,8 @@ export function AppointmentsPage() {
             dateFrom: '',
             dateTo: '',
           }))
-        }
+          setClearKey(k => k + 1)
+        }}
       />
 
       <AppointmentsTabs
