@@ -39,21 +39,23 @@ describe('AppointmentsTable', () => {
     expect(container.querySelector('tbody')).toBeInTheDocument()
   })
 
-  it('renders 7 column headers with correct labels', () => {
-    render(<AppointmentsTable data={appointments} />)
-    expect(screen.getByText('Nome')).toBeInTheDocument()
-    expect(screen.getByText('WhatsApp')).toBeInTheDocument()
-    expect(screen.getByText('Endereço')).toBeInTheDocument()
-    expect(screen.getByText('Serviço')).toBeInTheDocument()
-    expect(screen.getByText('Data/Hora')).toBeInTheDocument()
-    expect(screen.getByText('Status')).toBeInTheDocument()
-    expect(screen.getByText('Criado em')).toBeInTheDocument()
+  it('renders 8 column headers with correct labels', () => {
+    const { container } = render(<AppointmentsTable data={appointments} />)
+    const headers = Array.from(container.querySelectorAll('th')).map(th => th.textContent)
+    expect(headers).toContain('Nome')
+    expect(headers).toContain('WhatsApp')
+    expect(headers).toContain('Endereço')
+    expect(headers).toContain('Serviço')
+    expect(headers).toContain('Data/Hora')
+    expect(headers).toContain('Status')
+    expect(headers).toContain('Criado em')
+    expect(headers).toContain('Ações')
   })
 
   it('all th elements have scope="col"', () => {
     const { container } = render(<AppointmentsTable data={appointments} />)
     const headers = container.querySelectorAll('th')
-    expect(headers.length).toBe(7)
+    expect(headers.length).toBe(8)
     headers.forEach(th => {
       expect(th).toHaveAttribute('scope', 'col')
     })
