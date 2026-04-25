@@ -10,13 +10,21 @@ const STATUS_OPTIONS: { value: AppointmentStatus; label: string }[] = [
 interface StatusSelectProps {
   value: AppointmentStatus
   onChange: (status: AppointmentStatus) => void
+  onCancelRequest?: () => void
 }
 
-export function StatusSelect({ value, onChange }: StatusSelectProps) {
+export function StatusSelect({ value, onChange, onCancelRequest }: StatusSelectProps) {
   return (
     <select
       value={value}
-      onChange={e => onChange(e.target.value as AppointmentStatus)}
+      onChange={e => {
+        const next = e.target.value as AppointmentStatus
+        if (next === 'cancelado' && onCancelRequest) {
+          onCancelRequest()
+        } else {
+          onChange(next)
+        }
+      }}
       className="text-xs border border-zinc-200 rounded px-2 py-1 bg-white text-zinc-700 cursor-pointer hover:border-zinc-400 transition-colors"
       aria-label="Mudar status"
     >
