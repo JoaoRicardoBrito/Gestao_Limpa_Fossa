@@ -4,11 +4,13 @@ import { renderHook, waitFor } from '@testing-library/react'
 // -----------------------------------------------------------------------
 // vi.hoisted ensures these are available when vi.mock factory runs
 // -----------------------------------------------------------------------
-const { mockOrder, mockSelect, mockFrom } = vi.hoisted(() => {
+const { mockOrder, mockSelect, mockFrom, mockEq, mockUpdate } = vi.hoisted(() => {
   const mockOrder = vi.fn()
   const mockSelect = vi.fn(() => ({ order: mockOrder }))
-  const mockFrom = vi.fn(() => ({ select: mockSelect }))
-  return { mockOrder, mockSelect, mockFrom }
+  const mockEq = vi.fn()
+  const mockUpdate = vi.fn(() => ({ eq: mockEq }))
+  const mockFrom = vi.fn(() => ({ select: mockSelect, update: mockUpdate }))
+  return { mockOrder, mockSelect, mockFrom, mockEq, mockUpdate }
 })
 
 vi.mock('@/lib/supabase', () => ({
@@ -18,7 +20,7 @@ vi.mock('@/lib/supabase', () => ({
 }))
 
 // Import after mocks are registered
-import { fetchAppointments } from '@/services/appointments'
+import { fetchAppointments, updateAppointmentStatus, saveAppointmentNotes } from '@/services/appointments'
 import { useAppointments } from '@/hooks/useAppointments'
 import type { Appointment } from '@/types'
 
@@ -53,7 +55,8 @@ describe('fetchAppointments', () => {
     vi.clearAllMocks()
     // Restore chain after clearAllMocks resets return values
     mockSelect.mockReturnValue({ order: mockOrder })
-    mockFrom.mockReturnValue({ select: mockSelect })
+    mockUpdate.mockReturnValue({ eq: mockEq })
+    mockFrom.mockReturnValue({ select: mockSelect, update: mockUpdate })
   })
 
   it('calls supabase.from("appointments").select("*").order("data_hora", { ascending: true })', async () => {
@@ -89,11 +92,90 @@ describe('fetchAppointments', () => {
 // -----------------------------------------------------------------------
 // useAppointments hook tests
 // -----------------------------------------------------------------------
+describe('updateAppointmentStatus', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSelect.mockReturnValue({ order: mockOrder })
+    mockUpdate.mockReturnValue({ eq: mockEq })
+    mockFrom.mockReturnValue({ select: mockSelect, update: mockUpdate })
+  })
+
+  it('calls supabase update with motivo_cancelamento when status is cancelado and motivo is given', async () => {
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    await updateAppointmentStatus('id1', 'cancelado', 'Cliente desistiu')
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ motivo_cancelamento: 'Cliente desistiu' })
+    )
+    expect(mockEq).toHaveBeenCalledWith('id', 'id1')
+  })
+
+  it('does NOT include motivo_cancelamento when status is cancelado but motivo is not given', async () => {
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    await updateAppointmentStatus('id1', 'cancelado')
+
+    const updateArg = mockUpdate.mock.calls[0][0] as Record<string, unknown>
+    expect(updateArg).not.toHaveProperty('motivo_cancelamento')
+  })
+
+  it('writes concluido_em when status is concluido, no motivo_cancelamento', async () => {
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    await updateAppointmentStatus('id1', 'concluido')
+
+    const updateArg = mockUpdate.mock.calls[0][0] as Record<string, unknown>
+    expect(updateArg).toHaveProperty('concluido_em')
+    expect(updateArg).not.toHaveProperty('motivo_cancelamento')
+  })
+})
+
+describe('saveAppointmentNotes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSelect.mockReturnValue({ order: mockOrder })
+    mockUpdate.mockReturnValue({ eq: mockEq })
+    mockFrom.mockReturnValue({ select: mockSelect, update: mockUpdate })
+  })
+
+  it('calls supabase update with { notas, atualizado_em } and eq("id", id)', async () => {
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    await saveAppointmentNotes('id1', 'texto da nota')
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ notas: 'texto da nota' })
+    )
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ atualizado_em: expect.any(String) })
+    )
+    expect(mockEq).toHaveBeenCalledWith('id', 'id1')
+  })
+
+  it('returns { error: null } on success', async () => {
+    mockEq.mockResolvedValueOnce({ error: null })
+
+    const result = await saveAppointmentNotes('id1', 'nota')
+
+    expect(result).toEqual({ error: null })
+  })
+
+  it('returns { error: "Erro ao salvar nota." } on Supabase error', async () => {
+    mockEq.mockResolvedValueOnce({ error: { message: 'DB error' } })
+
+    const result = await saveAppointmentNotes('id1', 'nota')
+
+    expect(result).toEqual({ error: 'Erro ao salvar nota.' })
+  })
+})
+
 describe('useAppointments', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSelect.mockReturnValue({ order: mockOrder })
-    mockFrom.mockReturnValue({ select: mockSelect })
+    mockUpdate.mockReturnValue({ eq: mockEq })
+    mockFrom.mockReturnValue({ select: mockSelect, update: mockUpdate })
   })
 
   it('starts with isLoading=true and empty filteredData', () => {
