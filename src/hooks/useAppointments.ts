@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react'
-import { fetchAppointments } from '@/services/appointments'
+import { useEffect, useState, useMemo, useCallback } from 'react'
+import { fetchAppointments, updateAppointmentStatus } from '@/services/appointments'
 import type { Appointment, AppointmentStatus } from '@/types'
 
 export type TabFilter = AppointmentStatus | 'todos'
@@ -66,6 +66,18 @@ export function useAppointments() {
     [rawData]
   )
 
+  const updateStatus = useCallback(async (id: string, status: AppointmentStatus) => {
+    // Optimistic update
+    setRawData(prev => prev.map(a => a.id === id ? { ...a, status } : a))
+    const { error } = await updateAppointmentStatus(id, status)
+    if (error) {
+      // Revert on failure by refetching
+      fetchAppointments().then(({ data }) => {
+        if (data) setRawData(data)
+      })
+    }
+  }, [])
+
   return {
     filteredData,
     serviceOptions,
@@ -73,5 +85,6 @@ export function useAppointments() {
     error,
     filters,
     setFilters,
+    updateStatus,
   }
 }

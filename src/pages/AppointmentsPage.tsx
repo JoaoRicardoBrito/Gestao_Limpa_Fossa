@@ -17,6 +17,7 @@ export function AppointmentsPage() {
     error,
     filters,
     setFilters,
+    updateStatus,
   } = useAppointments()
 
   const hasActiveFilters =
@@ -92,11 +93,11 @@ export function AppointmentsPage() {
       {!isLoading && !error && filteredData.length > 0 && (
         <>
           <div className="hidden xl:block mt-4">
-            <AppointmentsTable data={filteredData} />
+            <AppointmentsTable data={filteredData} onStatusChange={updateStatus} />
           </div>
           <div className="xl:hidden flex flex-col gap-3 mt-4">
             {filteredData.map(a => (
-              <AppointmentCard key={a.id} appointment={a} />
+              <AppointmentCard key={a.id} appointment={a} onStatusChange={updateStatus} />
             ))}
           </div>
         </>

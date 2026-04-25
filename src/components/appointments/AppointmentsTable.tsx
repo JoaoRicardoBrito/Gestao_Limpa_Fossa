@@ -1,12 +1,14 @@
 import { format, parseISO } from 'date-fns'
-import type { Appointment } from '@/types'
+import type { Appointment, AppointmentStatus } from '@/types'
 import { StatusBadge } from './StatusBadge'
+import { StatusSelect } from './StatusSelect'
 
 interface AppointmentsTableProps {
   data: Appointment[]
+  onStatusChange?: (id: string, status: AppointmentStatus) => void
 }
 
-export function AppointmentsTable({ data }: AppointmentsTableProps) {
+export function AppointmentsTable({ data, onStatusChange }: AppointmentsTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
       <table className="w-full text-sm">
@@ -58,7 +60,15 @@ export function AppointmentsTable({ data }: AppointmentsTableProps) {
                 {a.data_hora ? format(parseISO(a.data_hora), 'dd/MM/yyyy HH:mm') : '—'}
               </td>
               <td className="px-4 py-3">
-                <StatusBadge appointment={a} />
+                <div className="flex items-center gap-2">
+                  <StatusBadge appointment={a} />
+                  {onStatusChange && (
+                    <StatusSelect
+                      value={a.status}
+                      onChange={status => onStatusChange(a.id, status)}
+                    />
+                  )}
+                </div>
               </td>
               <td className="px-4 py-3 text-sm text-zinc-700">
                 {a.criado_em ? format(parseISO(a.criado_em), 'dd/MM/yyyy') : '—'}

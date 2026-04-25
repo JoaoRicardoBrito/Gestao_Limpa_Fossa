@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { Appointment } from '@/types'
+import type { Appointment, AppointmentStatus } from '@/types'
 
 export interface FetchAppointmentsResult {
   data: Appointment[] | null
@@ -16,4 +16,24 @@ export async function fetchAppointments(): Promise<FetchAppointmentsResult> {
     return { data: null, error: 'Erro ao carregar agendamentos.' }
   }
   return { data: data as Appointment[], error: null }
+}
+
+export async function updateAppointmentStatus(
+  id: string,
+  status: AppointmentStatus
+): Promise<{ error: string | null }> {
+  const now = new Date().toISOString()
+  const extra =
+    status === 'concluido'
+      ? { concluido_em: now }
+      : status === 'cancelado'
+        ? { cancelado_em: now }
+        : {}
+
+  const { error } = await supabase
+    .from('appointments')
+    .update({ status, atualizado_em: now, ...extra })
+    .eq('id', id)
+
+  return { error: error ? 'Erro ao atualizar status.' : null }
 }
