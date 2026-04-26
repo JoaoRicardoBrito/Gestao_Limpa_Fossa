@@ -6,6 +6,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { LoginPage } from '@/pages/LoginPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AppointmentsPage } from '@/pages/AppointmentsPage'
+import { TrucksPage } from '@/pages/TrucksPage'
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false }
@@ -47,6 +48,7 @@ export function App() {
               <Route index element={<Navigate to="/agendamentos" replace />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/agendamentos" element={<AppointmentsPage />} />
+              <Route path="/caminhoes" element={<TrucksPage />} />
             </Route>
           </Route>
 
