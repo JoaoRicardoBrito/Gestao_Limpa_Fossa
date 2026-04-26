@@ -11,16 +11,22 @@ interface AppointmentsTableProps {
   data: Appointment[]
   onStatusChange?: (id: string, status: AppointmentStatus, motivo?: string) => void
   onSaveNotes?: (id: string, notes: string) => Promise<{ error: string | null }>
+  onStartRequest?: (id: string) => void
+  onCompleteRequest?: (id: string) => void
 }
 
 function AppointmentRow({
   a,
   onStatusChange,
   onSaveNotes,
+  onStartRequest,
+  onCompleteRequest,
 }: {
   a: Appointment
   onStatusChange?: (id: string, status: AppointmentStatus, motivo?: string) => void
   onSaveNotes?: (id: string, notes: string) => Promise<{ error: string | null }>
+  onStartRequest?: (id: string) => void
+  onCompleteRequest?: (id: string) => void
 }) {
   const [dialogOpen, setDialogOpen] = useState(false)
   return (
@@ -40,6 +46,8 @@ function AppointmentRow({
               value={a.status}
               onChange={status => onStatusChange(a.id, status)}
               onCancelRequest={() => setDialogOpen(true)}
+              onStartRequest={() => onStartRequest?.(a.id)}
+              onCompleteRequest={() => onCompleteRequest?.(a.id)}
             />
           )}
         </div>
@@ -73,7 +81,7 @@ function AppointmentRow({
   )
 }
 
-export function AppointmentsTable({ data, onStatusChange, onSaveNotes }: AppointmentsTableProps) {
+export function AppointmentsTable({ data, onStatusChange, onSaveNotes, onStartRequest, onCompleteRequest }: AppointmentsTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
       <table className="w-full text-sm">
@@ -112,6 +120,8 @@ export function AppointmentsTable({ data, onStatusChange, onSaveNotes }: Appoint
               a={a}
               onStatusChange={onStatusChange}
               onSaveNotes={onSaveNotes}
+              onStartRequest={onStartRequest}
+              onCompleteRequest={onCompleteRequest}
             />
           ))}
         </tbody>

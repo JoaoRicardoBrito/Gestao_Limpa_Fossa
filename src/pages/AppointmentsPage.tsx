@@ -7,9 +7,14 @@ import { AppointmentCard } from '@/components/appointments/AppointmentCard'
 import { SkeletonTable } from '@/components/appointments/SkeletonTable'
 import { SkeletonCard } from '@/components/appointments/SkeletonCard'
 import { EmptyState } from '@/components/appointments/EmptyState'
+import { StartTaskDialog } from '@/components/appointments/StartTaskDialog'
+import { CompleteTaskDialog } from '@/components/appointments/CompleteTaskDialog'
+import { completeAppointment } from '@/services/appointments'
 
 export function AppointmentsPage() {
   const [clearKey, setClearKey] = useState(0)
+  const [startDialogId, setStartDialogId] = useState<string | null>(null)
+  const [completeDialogId, setCompleteDialogId] = useState<string | null>(null)
   const {
     filteredData,
     serviceOptions,
@@ -26,6 +31,13 @@ export function AppointmentsPage() {
     filters.servico !== '' ||
     filters.dateFrom !== '' ||
     filters.dateTo !== ''
+
+  const startDialogAppointment = startDialogId
+    ? filteredData.find(a => a.id === startDialogId) ?? null
+    : null
+  const completeDialogAppointment = completeDialogId
+    ? filteredData.find(a => a.id === completeDialogId) ?? null
+    : null
 
   return (
     <div>
@@ -94,14 +106,56 @@ export function AppointmentsPage() {
       {!isLoading && !error && filteredData.length > 0 && (
         <>
           <div className="hidden xl:block mt-4">
-            <AppointmentsTable data={filteredData} onStatusChange={updateStatus} onSaveNotes={saveNotes} />
+            <AppointmentsTable
+              data={filteredData}
+              onStatusChange={updateStatus}
+              onSaveNotes={saveNotes}
+              onStartRequest={(id) => setStartDialogId(id)}
+              onCompleteRequest={(id) => setCompleteDialogId(id)}
+            />
           </div>
           <div className="xl:hidden flex flex-col gap-3 mt-4">
             {filteredData.map(a => (
-              <AppointmentCard key={a.id} appointment={a} onStatusChange={updateStatus} onSaveNotes={saveNotes} />
+              <AppointmentCard
+                key={a.id}
+                appointment={a}
+                onStatusChange={updateStatus}
+                onSaveNotes={saveNotes}
+                onStartRequest={() => setStartDialogId(a.id)}
+                onCompleteRequest={() => setCompleteDialogId(a.id)}
+              />
             ))}
           </div>
         </>
+      )}
+
+      {startDialogAppointment && (
+        <StartTaskDialog
+          open={startDialogId !== null}
+          onOpenChange={(open) => { if (!open) setStartDialogId(null) }}
+          appointmentName={startDialogAppointment.nome}
+          onConfirm={async (caminhao_placa) => {
+            await updateStatus(startDialogAppointment.id, 'em_andamento', undefined, caminhao_placa)
+            setStartDialogId(null)
+            return { error: null }
+          }}
+        />
+      )}
+
+      {completeDialogAppointment && (
+        <CompleteTaskDialog
+          open={completeDialogId !== null}
+          onOpenChange={(open) => { if (!open) setCompleteDialogId(null) }}
+          appointmentName={completeDialogAppointment.nome}
+          onConfirm={async (valor) => {
+            const { error } = await completeAppointment(completeDialogAppointment.id, valor)
+            if (!error) {
+              await updateStatus(completeDialogAppointment.id, 'concluido')
+            }
+            setCompleteDialogId(null)
+            return { error }
+          }}
+        />
       )}
     </div>
   )

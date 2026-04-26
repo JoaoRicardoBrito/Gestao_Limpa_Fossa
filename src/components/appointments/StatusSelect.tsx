@@ -11,9 +11,11 @@ interface StatusSelectProps {
   value: AppointmentStatus
   onChange: (status: AppointmentStatus) => void
   onCancelRequest?: () => void
+  onStartRequest?: () => void
+  onCompleteRequest?: () => void
 }
 
-export function StatusSelect({ value, onChange, onCancelRequest }: StatusSelectProps) {
+export function StatusSelect({ value, onChange, onCancelRequest, onStartRequest, onCompleteRequest }: StatusSelectProps) {
   return (
     <select
       value={value}
@@ -21,6 +23,10 @@ export function StatusSelect({ value, onChange, onCancelRequest }: StatusSelectP
         const next = e.target.value as AppointmentStatus
         if (next === 'cancelado' && onCancelRequest) {
           onCancelRequest()
+        } else if (next === 'em_andamento' && onStartRequest) {
+          onStartRequest()
+        } else if (next === 'concluido' && onCompleteRequest) {
+          onCompleteRequest()
         } else {
           onChange(next)
         }

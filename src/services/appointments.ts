@@ -42,6 +42,18 @@ export async function updateAppointmentStatus(
   return { error: error ? 'Erro ao atualizar status.' : null }
 }
 
+export async function completeAppointment(
+  id: string,
+  valor: number
+): Promise<{ error: string | null }> {
+  const now = new Date().toISOString()
+  const { error } = await supabase
+    .from('appointments')
+    .update({ status: 'concluido', concluido_em: now, valor, atualizado_em: now })
+    .eq('id', id)
+  return { error: error ? 'Erro ao concluir agendamento.' : null }
+}
+
 export async function saveAppointmentNotes(
   id: string,
   notas: string

@@ -13,9 +13,11 @@ interface AppointmentCardProps {
   appointment: Appointment
   onStatusChange?: (id: string, status: AppointmentStatus, motivo?: string) => void
   onSaveNotes?: (id: string, notes: string) => Promise<{ error: string | null }>
+  onStartRequest?: () => void
+  onCompleteRequest?: () => void
 }
 
-export function AppointmentCard({ appointment: a, onStatusChange, onSaveNotes }: AppointmentCardProps) {
+export function AppointmentCard({ appointment: a, onStatusChange, onSaveNotes, onStartRequest, onCompleteRequest }: AppointmentCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
@@ -53,6 +55,8 @@ export function AppointmentCard({ appointment: a, onStatusChange, onSaveNotes }:
               value={a.status}
               onChange={status => onStatusChange(a.id, status)}
               onCancelRequest={() => setDialogOpen(true)}
+              onStartRequest={onStartRequest}
+              onCompleteRequest={onCompleteRequest}
             />
           )}
         </div>
