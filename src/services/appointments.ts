@@ -21,7 +21,8 @@ export async function fetchAppointments(): Promise<FetchAppointmentsResult> {
 export async function updateAppointmentStatus(
   id: string,
   status: AppointmentStatus,
-  motivo?: string
+  motivo?: string,
+  caminhao_placa?: string
 ): Promise<{ error: string | null }> {
   const now = new Date().toISOString()
   const extra =
@@ -29,7 +30,9 @@ export async function updateAppointmentStatus(
       ? { concluido_em: now }
       : status === 'cancelado'
         ? { cancelado_em: now, ...(motivo ? { motivo_cancelamento: motivo } : {}) }
-        : {}
+        : status === 'em_andamento' && caminhao_placa
+          ? { caminhao_placa }
+          : {}
 
   const { error } = await supabase
     .from('appointments')
