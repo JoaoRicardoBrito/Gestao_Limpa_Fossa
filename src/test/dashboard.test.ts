@@ -4,10 +4,10 @@ import type { Appointment } from '@/types'
 // -----------------------------------------------------------------------
 // vi.hoisted ensures these are available when vi.mock factory runs
 // -----------------------------------------------------------------------
-const { mockSelect, mockFrom } = vi.hoisted(() => {
+const { mockFrom } = vi.hoisted(() => {
   const mockSelect = vi.fn()
   const mockFrom = vi.fn(() => ({ select: mockSelect }))
-  return { mockSelect, mockFrom }
+  return { mockFrom }
 })
 
 vi.mock('@/lib/supabase', () => ({
