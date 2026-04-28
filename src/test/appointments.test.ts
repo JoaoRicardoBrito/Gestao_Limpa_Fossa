@@ -43,6 +43,8 @@ function makeAppointment(overrides: Partial<Appointment> = {}): Appointment {
     motivo_cancelamento: null,
     notas: null,
     valor: null,
+    em_andamento_em: null,
+    caminhao_placa: null,
     ...overrides,
   }
 }
