@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { format, parseISO } from 'date-fns'
+import { formatStoredDate } from '@/lib/dateUtils'
 import type { Appointment, AppointmentStatus } from '@/types'
 import { StatusBadge } from './StatusBadge'
 import { StatusSelect } from './StatusSelect'
@@ -36,7 +36,7 @@ function AppointmentRow({
       <td className="px-4 py-3 text-sm text-zinc-700 max-w-[220px] truncate" title={a.endereco}>{a.endereco}</td>
       <td className="px-4 py-3 text-sm text-zinc-700">{a.servico}</td>
       <td className="px-4 py-3 text-sm text-zinc-700">
-        {a.data_hora ? format(parseISO(a.data_hora), 'dd/MM/yyyy HH:mm') : '—'}
+        {a.data_hora ? formatStoredDate(a.data_hora, 'dd/MM/yyyy HH:mm') : '—'}
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
