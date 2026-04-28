@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, CheckCircle2, DollarSign } from 'lucide-react'
+import { CalendarDays, Clock, CheckCircle2, DollarSign, Timer } from 'lucide-react'
 import { KpiCard } from './KpiCard'
 import type { KpiData } from '@/hooks/useDashboard'
 
@@ -7,8 +7,15 @@ interface KpiGridProps {
   loading: boolean
 }
 
+function formatDuracao(minutos: number | null): string {
+  if (minutos === null) return '—'
+  if (minutos < 60) return `${minutos} min`
+  const h = Math.floor(minutos / 60)
+  const m = minutos % 60
+  return m > 0 ? `${h}h ${m}min` : `${h}h`
+}
+
 export function KpiGrid({ kpis, loading }: KpiGridProps) {
-  // Format ticket médio: "R$ {value}" or "R$ —" when null
   const ticketValue = kpis?.ticketMedio !== null && kpis?.ticketMedio !== undefined
     ? `R$ ${kpis.ticketMedio}`
     : 'R$ —'
@@ -47,6 +54,16 @@ export function KpiGrid({ kpis, loading }: KpiGridProps) {
         iconColor="text-violet-600"
         loading={loading}
       />
+      <div className="col-span-2">
+        <KpiCard
+          label="Duração Média do Serviço"
+          value={loading ? '' : formatDuracao(kpis?.duracaoMedia ?? null)}
+          icon={Timer}
+          iconBg="bg-orange-50"
+          iconColor="text-orange-600"
+          loading={loading}
+        />
+      </div>
     </div>
   )
 }

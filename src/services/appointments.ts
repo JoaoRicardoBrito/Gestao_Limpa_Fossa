@@ -30,8 +30,8 @@ export async function updateAppointmentStatus(
       ? { concluido_em: now }
       : status === 'cancelado'
         ? { cancelado_em: now, ...(motivo ? { motivo_cancelamento: motivo } : {}) }
-        : status === 'em_andamento' && caminhao_placa
-          ? { caminhao_placa }
+        : status === 'em_andamento'
+          ? { em_andamento_em: now, ...(caminhao_placa ? { caminhao_placa } : {}) }
           : {}
 
   const { error } = await supabase

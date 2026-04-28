@@ -21,6 +21,8 @@ export interface Appointment {
   motivo_cancelamento: string | null
   notas: string | null
   valor: number | null
+  em_andamento_em: string | null
+  caminhao_placa: string | null
 }
 
 export interface AuthError {

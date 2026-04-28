@@ -8,7 +8,8 @@ export interface KpiData {
   totalMes: number
   pendentesAgora: number
   concluidosMes: number
-  ticketMedio: number | null  // null → render "R$ —"
+  ticketMedio: number | null    // null → render "R$ —"
+  duracaoMedia: number | null   // minutes, null → render "—"
 }
 
 export interface BarDataPoint {
@@ -83,7 +84,25 @@ export function computeKpis(appointments: Appointment[]): KpiData {
       )
     : null
 
-  return { totalMes, pendentesAgora, concluidosMes, ticketMedio }
+  // Duração Média: avg(concluido_em - em_andamento_em) in minutes for concluido in current month
+  const concluidosComDuracao = appointments.filter(a =>
+    a.status === 'concluido' &&
+    a.em_andamento_em !== null &&
+    a.concluido_em !== null &&
+    a.concluido_em >= start &&
+    a.concluido_em <= end
+  )
+  const duracaoMedia = concluidosComDuracao.length > 0
+    ? Math.round(
+        concluidosComDuracao.reduce((sum, a) => {
+          const mins =
+            (new Date(a.concluido_em!).getTime() - new Date(a.em_andamento_em!).getTime()) / 60_000
+          return sum + mins
+        }, 0) / concluidosComDuracao.length
+      )
+    : null
+
+  return { totalMes, pendentesAgora, concluidosMes, ticketMedio, duracaoMedia }
 }
 
 export function computeBarData(appointments: Appointment[]): BarDataPoint[] {
