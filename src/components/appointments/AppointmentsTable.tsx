@@ -53,7 +53,7 @@ function AppointmentRow({
         </div>
       </td>
       <td className="px-4 py-3 text-sm text-zinc-700">
-        {a.criado_em ? format(parseISO(a.criado_em), 'dd/MM/yyyy') : '—'}
+        {a.criado_em ? formatStoredDate(a.criado_em, 'dd/MM/yyyy') : '—'}
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2 flex-wrap">
