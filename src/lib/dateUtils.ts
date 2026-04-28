@@ -1,16 +1,14 @@
 import { format, parseISO } from 'date-fns'
 
-// The public site stores appointment times via <input type="datetime-local">,
-// which captures the user's local BRT time but sends it to Supabase without a
-// timezone offset. Supabase (UTC session) stores "10:40 BRT" as "10:40 UTC".
-// Displaying with date-fns format() in a BRT browser would subtract 3h → "07:40".
-// Fix: read the UTC components and build a timezone-neutral Date so format()
-// shows the stored digits as-is, matching what the user typed.
+// The public site stores appointment times 3h behind the intended BRT time
+// (UTC-3 offset not applied when saving). Adding 3h before display corrects it.
+// Uses UTC components after correction to avoid a second browser-TZ shift.
 export function formatStoredDate(iso: string, pattern: string): string {
   const d = parseISO(iso)
+  const corrected = new Date(d.getTime() + 3 * 60 * 60 * 1000)
   const neutral = new Date(
-    d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(),
-    d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()
+    corrected.getUTCFullYear(), corrected.getUTCMonth(), corrected.getUTCDate(),
+    corrected.getUTCHours(), corrected.getUTCMinutes(), corrected.getUTCSeconds()
   )
   return format(neutral, pattern)
 }
