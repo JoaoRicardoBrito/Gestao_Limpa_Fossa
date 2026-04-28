@@ -28,3 +28,4 @@ CREATE POLICY "Authenticated users can update trucks"
   ON trucks FOR UPDATE
   TO authenticated
   USING (true);
+
