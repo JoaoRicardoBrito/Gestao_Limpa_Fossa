@@ -54,6 +54,28 @@ export async function completeAppointment(
   return { error: error ? 'Erro ao concluir agendamento.' : null }
 }
 
+export async function createAppointment(payload: {
+  nome: string
+  whatsapp: string
+  endereco: string
+  servico: string
+  data_hora: string
+  notas?: string
+}): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('appointments')
+    .insert({
+      nome: payload.nome.trim(),
+      whatsapp: payload.whatsapp.trim(),
+      endereco: payload.endereco.trim(),
+      servico: payload.servico.trim(),
+      data_hora: payload.data_hora,
+      status: 'pendente',
+      notas: payload.notas?.trim() || null,
+    })
+  return { error: error ? 'Erro ao cadastrar cliente.' : null }
+}
+
 export async function saveAppointmentNotes(
   id: string,
   notas: string

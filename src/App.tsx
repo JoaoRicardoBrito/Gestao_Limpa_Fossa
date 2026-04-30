@@ -7,6 +7,7 @@ import { LoginPage } from '@/pages/LoginPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AppointmentsPage } from '@/pages/AppointmentsPage'
 import { TrucksPage } from '@/pages/TrucksPage'
+import { CadastrarClientePage } from '@/pages/CadastrarClientePage'
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false }
@@ -49,6 +50,7 @@ export function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/agendamentos" element={<AppointmentsPage />} />
               <Route path="/caminhoes" element={<TrucksPage />} />
+              <Route path="/cadastrar-cliente" element={<CadastrarClientePage />} />
             </Route>
           </Route>
 

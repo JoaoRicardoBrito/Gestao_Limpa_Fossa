@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CalendarDays, LogOut, Truck } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, LogOut, Truck, UserPlus } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
@@ -15,6 +15,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
   { label: 'Agendamentos', icon: CalendarDays, href: '/agendamentos' },
   { label: 'Caminhões', icon: Truck, href: '/caminhoes' },
+  { label: 'Cadastrar Cliente', icon: UserPlus, href: '/cadastrar-cliente' },
 ]
 
 export function Sidebar() {
