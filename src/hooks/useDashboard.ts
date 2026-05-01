@@ -127,10 +127,22 @@ export function computeBarData(appointments: Appointment[]): BarDataPoint[] {
   return result
 }
 
+const SLUG_TO_LABEL: Record<string, string> = {
+  'limpeza-fossa':   'Limpeza de Fossa',
+  'hidrojateamento': 'Hidrojetamento',
+  'caixa-gordura':   'Caixa de Gordura',
+  'desentupimento':  'Desentupimento de Rede de Esgoto',
+}
+
+function normalizeServico(raw: string): string {
+  return SLUG_TO_LABEL[raw] ?? raw
+}
+
 export function computeDonutData(appointments: Appointment[]): DonutDataPoint[] {
   const counts: Record<string, number> = {}
   for (const a of appointments) {
-    counts[a.servico] = (counts[a.servico] ?? 0) + 1
+    const label = normalizeServico(a.servico)
+    counts[label] = (counts[label] ?? 0) + 1
   }
   return Object.entries(counts)
     .map(([name, value]) => ({ name, value }))
