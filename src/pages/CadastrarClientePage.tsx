@@ -1,18 +1,32 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { Loader2, UserPlus, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { createAppointment } from '@/services/appointments'
+
+const SERVICOS = [
+  'Limpeza de Fossa',
+  'Hidrojetamento',
+  'Caixa de Gordura',
+  'Desentupimento de Rede de Esgoto',
+] as const
 
 const schema = z.object({
   nome: z.string().min(2, 'Nome obrigatório.'),
   whatsapp: z.string().min(10, 'WhatsApp deve ter pelo menos 10 dígitos.'),
   endereco: z.string().min(5, 'Endereço obrigatório.'),
-  servico: z.string().min(2, 'Serviço obrigatório.'),
+  servico: z.enum(SERVICOS, { errorMap: () => ({ message: 'Selecione um serviço.' }) }),
   data_hora: z.string().min(1, 'Data e hora obrigatórias.'),
   notas: z.string().optional(),
 })
@@ -31,6 +45,7 @@ export function CadastrarClientePage() {
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -122,7 +137,22 @@ export function CadastrarClientePage() {
               <label className="text-xs font-medium text-zinc-700 block mb-1">
                 Serviço <span className="text-red-500">*</span>
               </label>
-              <Input {...register('servico')} placeholder="Ex: Limpeza de fossa" />
+              <Controller
+                name="servico"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger aria-label="Selecionar serviço">
+                      <SelectValue placeholder="Selecione um serviço" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SERVICOS.map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               <FieldError message={errors.servico?.message} />
             </div>
             <div>
