@@ -153,7 +153,8 @@ export function AppointmentsPage() {
           trucks={trucks}
           motoristas={motoristas}
           onConfirm={async (caminhao_placa, motorista_id) => {
-            return updateStatus(startDialogAppointment.id, 'em_andamento', undefined, caminhao_placa, motorista_id)
+            await updateStatus(startDialogAppointment.id, 'em_andamento', undefined, caminhao_placa, motorista_id)
+            return { error: null }
           }}
         />
       )}
