@@ -13,6 +13,7 @@ interface AppointmentsTableProps {
   onSaveNotes?: (id: string, notes: string) => Promise<{ error: string | null }>
   onStartRequest?: (id: string) => void
   onCompleteRequest?: (id: string) => void
+  getMotoristaName?: (motorista_id: string | null) => string | null
 }
 
 function AppointmentRow({
@@ -21,14 +22,17 @@ function AppointmentRow({
   onSaveNotes,
   onStartRequest,
   onCompleteRequest,
+  getMotoristaName,
 }: {
   a: Appointment
   onStatusChange?: (id: string, status: AppointmentStatus, motivo?: string) => void
   onSaveNotes?: (id: string, notes: string) => Promise<{ error: string | null }>
   onStartRequest?: (id: string) => void
   onCompleteRequest?: (id: string) => void
+  getMotoristaName?: (motorista_id: string | null) => string | null
 }) {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const motoristaName = getMotoristaName?.(a.motorista_id) ?? null
   return (
     <tr className="hover:bg-zinc-50 transition-colors">
       <td className="px-4 py-3 text-sm text-zinc-900 max-w-[180px] truncate" title={a.nome}>{a.nome}</td>
@@ -51,6 +55,11 @@ function AppointmentRow({
             />
           )}
         </div>
+        {motoristaName && (
+          <span className="text-xs text-zinc-500 mt-1 block">
+            Motorista: {motoristaName}
+          </span>
+        )}
       </td>
       <td className="px-4 py-3 text-sm text-zinc-700">
         {a.criado_em ? formatStoredDate(a.criado_em, 'dd/MM/yyyy') : '—'}
@@ -81,7 +90,7 @@ function AppointmentRow({
   )
 }
 
-export function AppointmentsTable({ data, onStatusChange, onSaveNotes, onStartRequest, onCompleteRequest }: AppointmentsTableProps) {
+export function AppointmentsTable({ data, onStatusChange, onSaveNotes, onStartRequest, onCompleteRequest, getMotoristaName }: AppointmentsTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
       <table className="w-full text-sm">
@@ -122,6 +131,7 @@ export function AppointmentsTable({ data, onStatusChange, onSaveNotes, onStartRe
               onSaveNotes={onSaveNotes}
               onStartRequest={onStartRequest}
               onCompleteRequest={onCompleteRequest}
+              getMotoristaName={getMotoristaName}
             />
           ))}
         </tbody>

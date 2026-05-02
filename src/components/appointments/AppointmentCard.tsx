@@ -15,10 +15,12 @@ interface AppointmentCardProps {
   onSaveNotes?: (id: string, notes: string) => Promise<{ error: string | null }>
   onStartRequest?: () => void
   onCompleteRequest?: () => void
+  getMotoristaName?: (motorista_id: string | null) => string | null
 }
 
-export function AppointmentCard({ appointment: a, onStatusChange, onSaveNotes, onStartRequest, onCompleteRequest }: AppointmentCardProps) {
+export function AppointmentCard({ appointment: a, onStatusChange, onSaveNotes, onStartRequest, onCompleteRequest, getMotoristaName }: AppointmentCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const motoristaName = getMotoristaName?.(a.motorista_id) ?? null
 
   return (
     <Card className="border-zinc-200 shadow-none">
@@ -26,7 +28,12 @@ export function AppointmentCard({ appointment: a, onStatusChange, onSaveNotes, o
         {/* Row 1: Nome + Status */}
         <div className="flex items-start justify-between gap-2">
           <p className="font-semibold text-zinc-900 text-sm truncate">{a.nome}</p>
-          <StatusBadge appointment={a} />
+          <div className="flex flex-col items-end gap-0.5">
+            <StatusBadge appointment={a} />
+            {motoristaName && (
+              <span className="text-xs text-zinc-500">Motorista: {motoristaName}</span>
+            )}
+          </div>
         </div>
 
         {/* Row 2: Serviço */}
