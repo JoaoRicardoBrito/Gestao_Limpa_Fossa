@@ -147,11 +147,9 @@ export function AppointmentsPage() {
         <StartTaskDialog
           open={startDialogId !== null}
           onOpenChange={(open) => { if (!open) setStartDialogId(null) }}
-          appointmentName={startDialogAppointment.nome}
+          appointment={startDialogAppointment}
           onConfirm={async (caminhao_placa, motorista_id) => {
-            await updateStatus(startDialogAppointment.id, 'em_andamento', undefined, caminhao_placa, motorista_id)
-            setStartDialogId(null)
-            return { error: null }
+            return updateStatus(startDialogAppointment.id, 'em_andamento', undefined, caminhao_placa, motorista_id)
           }}
         />
       )}
