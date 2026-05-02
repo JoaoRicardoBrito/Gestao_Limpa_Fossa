@@ -23,6 +23,15 @@ export interface Appointment {
   valor: number | null
   em_andamento_em: string | null
   caminhao_placa: string | null
+  motorista_id: string | null
+}
+
+export interface Motorista {
+  id: string
+  nome: string
+  telefone: string
+  ativo: boolean
+  criado_em: string
 }
 
 export interface AuthError {
