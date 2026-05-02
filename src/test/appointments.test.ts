@@ -45,6 +45,7 @@ function makeAppointment(overrides: Partial<Appointment> = {}): Appointment {
     valor: null,
     em_andamento_em: null,
     caminhao_placa: null,
+    motorista_id: null,
     ...overrides,
   }
 }
