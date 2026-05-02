@@ -22,7 +22,8 @@ export async function updateAppointmentStatus(
   id: string,
   status: AppointmentStatus,
   motivo?: string,
-  caminhao_placa?: string
+  caminhao_placa?: string,
+  motorista_id?: string
 ): Promise<{ error: string | null }> {
   const now = new Date().toISOString()
   const extra =
@@ -31,7 +32,11 @@ export async function updateAppointmentStatus(
       : status === 'cancelado'
         ? { cancelado_em: now, ...(motivo ? { motivo_cancelamento: motivo } : {}) }
         : status === 'em_andamento'
-          ? { em_andamento_em: now, ...(caminhao_placa ? { caminhao_placa } : {}) }
+          ? {
+              em_andamento_em: now,
+              ...(caminhao_placa ? { caminhao_placa } : {}),
+              ...(motorista_id ? { motorista_id } : {}),
+            }
           : {}
 
   const { error } = await supabase

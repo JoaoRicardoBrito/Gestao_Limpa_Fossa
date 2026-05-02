@@ -66,10 +66,10 @@ export function useAppointments() {
     [rawData]
   )
 
-  const updateStatus = useCallback(async (id: string, status: AppointmentStatus, motivo?: string, caminhao_placa?: string) => {
+  const updateStatus = useCallback(async (id: string, status: AppointmentStatus, motivo?: string, caminhao_placa?: string, motorista_id?: string) => {
     // Optimistic update
-    setRawData(prev => prev.map(a => a.id === id ? { ...a, status } : a))
-    const { error } = await updateAppointmentStatus(id, status, motivo, caminhao_placa)
+    setRawData(prev => prev.map(a => a.id === id ? { ...a, status, ...(motorista_id ? { motorista_id } : {}), ...(caminhao_placa ? { caminhao_placa } : {}) } : a))
+    const { error } = await updateAppointmentStatus(id, status, motivo, caminhao_placa, motorista_id)
     if (error) {
       // Revert on failure by refetching
       fetchAppointments().then(({ data }) => {
