@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Loader2, Truck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useTrucks } from '@/hooks/useTrucks'
+import { fetchServiceCountsByCaminhao } from '@/services/serviceCounts'
 
 export function TrucksPage() {
   const { trucks, isLoading, addTruck, deactivateTruck } = useTrucks()
@@ -11,6 +12,16 @@ export function TrucksPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [deactivatingId, setDeactivatingId] = useState<string | null>(null)
+  const [counts, setCounts] = useState<Map<string, number>>(new Map())
+
+  useEffect(() => {
+    let cancelled = false
+    fetchServiceCountsByCaminhao().then(({ data }) => {
+      if (cancelled || !data) return
+      setCounts(data)
+    })
+    return () => { cancelled = true }
+  }, [trucks.length])
 
   const canSubmit = placa.trim().length >= 2 && modelo.trim().length >= 2
 
@@ -101,6 +112,9 @@ export function TrucksPage() {
                   Modelo
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-zinc-500">
+                  Serviços
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-zinc-500">
                   Ação
                 </th>
               </tr>
@@ -110,6 +124,7 @@ export function TrucksPage() {
                 <tr key={truck.id} className="hover:bg-zinc-50 transition-colors">
                   <td className="px-4 py-3 text-sm font-mono text-zinc-900">{truck.placa}</td>
                   <td className="px-4 py-3 text-sm text-zinc-700">{truck.modelo}</td>
+                  <td className="px-4 py-3 text-sm text-zinc-700">{counts.get(truck.placa) ?? 0}</td>
                   <td className="px-4 py-3">
                     <Button
                       variant="ghost"
