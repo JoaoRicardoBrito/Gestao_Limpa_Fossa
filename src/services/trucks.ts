@@ -31,10 +31,36 @@ export async function addTruck(
   return { error: error ? 'Erro ao cadastrar caminhão.' : null }
 }
 
+export async function fetchInactiveTrucks(): Promise<{ data: Truck[] | null; error: string | null }> {
+  const { data, error } = await supabase
+    .from('trucks')
+    .select('*')
+    .eq('ativo', false)
+    .order('placa', { ascending: true })
+  if (error) return { data: null, error: 'Erro ao carregar caminhões inativos.' }
+  return { data: data as Truck[], error: null }
+}
+
 export async function deactivateTruck(id: string): Promise<{ error: string | null }> {
   const { error } = await supabase
     .from('trucks')
     .update({ ativo: false })
     .eq('id', id)
   return { error: error ? 'Erro ao desativar caminhão.' : null }
+}
+
+export async function reactivateTruck(id: string): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('trucks')
+    .update({ ativo: true })
+    .eq('id', id)
+  return { error: error ? 'Erro ao reativar caminhão.' : null }
+}
+
+export async function deleteTruck(id: string): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('trucks')
+    .delete()
+    .eq('id', id)
+  return { error: error ? 'Erro ao apagar caminhão.' : null }
 }
