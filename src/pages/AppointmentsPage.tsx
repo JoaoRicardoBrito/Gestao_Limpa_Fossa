@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useAppointments } from '@/hooks/useAppointments'
+import { useMotoristas } from '@/hooks/useMotoristas'
 import { AppointmentsTabs } from '@/components/appointments/AppointmentsTabs'
 import { AppointmentsFilters } from '@/components/appointments/AppointmentsFilters'
 import { AppointmentsTable } from '@/components/appointments/AppointmentsTable'
@@ -25,6 +26,17 @@ export function AppointmentsPage() {
     updateStatus,
     saveNotes,
   } = useAppointments()
+
+  const { motoristas } = useMotoristas()
+  const motoristaNameById = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const m of motoristas) map.set(m.id, m.nome)
+    return map
+  }, [motoristas])
+  const getMotoristaName = useCallback(
+    (id: string | null) => (id ? motoristaNameById.get(id) ?? null : null),
+    [motoristaNameById]
+  )
 
   const hasActiveFilters =
     filters.search !== '' ||
@@ -112,6 +124,7 @@ export function AppointmentsPage() {
               onSaveNotes={saveNotes}
               onStartRequest={(id) => setStartDialogId(id)}
               onCompleteRequest={(id) => setCompleteDialogId(id)}
+              getMotoristaName={getMotoristaName}
             />
           </div>
           <div className="xl:hidden flex flex-col gap-3 mt-4">
@@ -123,6 +136,7 @@ export function AppointmentsPage() {
                 onSaveNotes={saveNotes}
                 onStartRequest={() => setStartDialogId(a.id)}
                 onCompleteRequest={() => setCompleteDialogId(a.id)}
+                getMotoristaName={getMotoristaName}
               />
             ))}
           </div>
@@ -134,8 +148,8 @@ export function AppointmentsPage() {
           open={startDialogId !== null}
           onOpenChange={(open) => { if (!open) setStartDialogId(null) }}
           appointmentName={startDialogAppointment.nome}
-          onConfirm={async (caminhao_placa) => {
-            await updateStatus(startDialogAppointment.id, 'em_andamento', undefined, caminhao_placa)
+          onConfirm={async (caminhao_placa, motorista_id) => {
+            await updateStatus(startDialogAppointment.id, 'em_andamento', undefined, caminhao_placa, motorista_id)
             setStartDialogId(null)
             return { error: null }
           }}
