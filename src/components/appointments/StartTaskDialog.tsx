@@ -17,15 +17,16 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog'
-import { useTrucks } from '@/hooks/useTrucks'
-import { useMotoristas } from '@/hooks/useMotoristas'
 import { formatStoredDate } from '@/lib/dateUtils'
 import type { Motorista } from '@/types'
+import type { Truck } from '@/services/trucks'
 
 interface StartTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   appointment: { nome: string; endereco: string; data_hora: string }
+  trucks: Truck[]
+  motoristas: Motorista[]
   onConfirm: (caminhao_placa: string, motorista_id: string) => Promise<{ error: string | null }>
 }
 
@@ -51,6 +52,8 @@ export function StartTaskDialog({
   open,
   onOpenChange,
   appointment,
+  trucks,
+  motoristas,
   onConfirm,
 }: StartTaskDialogProps) {
   const [step, setStep] = useState<'select' | 'notify'>('select')
@@ -59,8 +62,6 @@ export function StartTaskDialog({
   const [confirmedMotorista, setConfirmedMotorista] = useState<Motorista | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { trucks, isLoading: trucksLoading } = useTrucks()
-  const { motoristas, isLoading: motoristasLoading } = useMotoristas()
 
   async function handleConfirm() {
     if (!selectedPlaca || !selectedMotoristaId) return
@@ -108,9 +109,7 @@ export function StartTaskDialog({
               {/* Caminhão */}
               <div className="space-y-2">
                 <label className="text-sm text-zinc-700" htmlFor="truck-select">Caminhão</label>
-                {trucksLoading ? (
-                  <p className="text-sm text-zinc-500">Carregando caminhões...</p>
-                ) : trucks.length === 0 ? (
+                {trucks.length === 0 ? (
                   <p className="text-sm text-red-500">
                     Nenhum caminhão cadastrado. Cadastre um em Caminhões antes de iniciar.
                   </p>
@@ -133,9 +132,7 @@ export function StartTaskDialog({
               {/* Motorista */}
               <div className="space-y-2">
                 <label className="text-sm text-zinc-700" htmlFor="motorista-select">Motorista</label>
-                {motoristasLoading ? (
-                  <p className="text-sm text-zinc-500">Carregando motoristas...</p>
-                ) : motoristas.length === 0 ? (
+                {motoristas.length === 0 ? (
                   <p className="text-sm text-red-500">
                     Nenhum motorista cadastrado. Cadastre um em Motoristas antes de iniciar.
                   </p>

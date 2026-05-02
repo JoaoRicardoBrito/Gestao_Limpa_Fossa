@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useAppointments } from '@/hooks/useAppointments'
 import { useMotoristas } from '@/hooks/useMotoristas'
+import { useTrucks } from '@/hooks/useTrucks'
 import { AppointmentsTabs } from '@/components/appointments/AppointmentsTabs'
 import { AppointmentsFilters } from '@/components/appointments/AppointmentsFilters'
 import { AppointmentsTable } from '@/components/appointments/AppointmentsTable'
@@ -28,6 +29,7 @@ export function AppointmentsPage() {
   } = useAppointments()
 
   const { motoristas } = useMotoristas()
+  const { trucks } = useTrucks()
   const motoristaNameById = useMemo(() => {
     const map = new Map<string, string>()
     for (const m of motoristas) map.set(m.id, m.nome)
@@ -148,6 +150,8 @@ export function AppointmentsPage() {
           open={startDialogId !== null}
           onOpenChange={(open) => { if (!open) setStartDialogId(null) }}
           appointment={startDialogAppointment}
+          trucks={trucks}
+          motoristas={motoristas}
           onConfirm={async (caminhao_placa, motorista_id) => {
             return updateStatus(startDialogAppointment.id, 'em_andamento', undefined, caminhao_placa, motorista_id)
           }}
