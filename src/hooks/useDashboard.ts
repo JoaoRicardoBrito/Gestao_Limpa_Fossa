@@ -85,21 +85,28 @@ export function computeKpis(appointments: Appointment[]): KpiData {
     : null
 
   // Duração Média: avg(concluido_em - em_andamento_em) in minutes for concluido in current month
+  // Uses != null (loose) to guard against both null and undefined from partial selects
   const concluidosComDuracao = appointments.filter(a =>
     a.status === 'concluido' &&
-    a.em_andamento_em !== null &&
-    a.concluido_em !== null &&
+    a.em_andamento_em != null &&
+    a.concluido_em != null &&
     a.concluido_em >= start &&
     a.concluido_em <= end
   )
   const duracaoMedia = concluidosComDuracao.length > 0
-    ? Math.round(
-        concluidosComDuracao.reduce((sum, a) => {
-          const mins =
-            (new Date(a.concluido_em!).getTime() - new Date(a.em_andamento_em!).getTime()) / 60_000
-          return sum + mins
-        }, 0) / concluidosComDuracao.length
-      )
+    ? (() => {
+        const totalMins = concluidosComDuracao.reduce((sum, a) => {
+          const inicio = new Date(a.em_andamento_em!).getTime()
+          const fim = new Date(a.concluido_em!).getTime()
+          const mins = (fim - inicio) / 60_000
+          return isNaN(mins) || mins < 0 ? sum : sum + mins
+        }, 0)
+        const validCount = concluidosComDuracao.filter(a => {
+          const mins = (new Date(a.concluido_em!).getTime() - new Date(a.em_andamento_em!).getTime()) / 60_000
+          return !isNaN(mins) && mins >= 0
+        }).length
+        return validCount > 0 ? Math.round(totalMins / validCount) : null
+      })()
     : null
 
   return { totalMes, pendentesAgora, concluidosMes, ticketMedio, duracaoMedia }
