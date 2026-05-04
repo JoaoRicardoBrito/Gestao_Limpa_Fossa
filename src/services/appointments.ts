@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { Appointment, AppointmentStatus } from '@/types'
+import { invalidateServiceCountsCache } from '@/services/serviceCounts'
 
 export interface FetchAppointmentsResult {
   data: Appointment[] | null
@@ -50,6 +51,8 @@ export async function updateAppointmentStatus(
 
   if (error) return { error: 'Erro ao atualizar status.' }
   if (!updated || updated.length === 0) return { error: 'Status final não pode ser alterado.' }
+  // Invalidate service count cache whenever a status changes to concluido
+  if (status === 'concluido') invalidateServiceCountsCache()
   return { error: null }
 }
 
@@ -62,6 +65,7 @@ export async function completeAppointment(
     .from('appointments')
     .update({ status: 'concluido', concluido_em: now, valor, atualizado_em: now })
     .eq('id', id)
+  if (!error) invalidateServiceCountsCache()
   return { error: error ? 'Erro ao concluir agendamento.' : null }
 }
 
