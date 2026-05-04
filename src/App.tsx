@@ -1,14 +1,31 @@
-import { Component, type ReactNode } from 'react'
+import { Component, lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from '@/hooks/useAuth'
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { Skeleton } from '@/components/ui/skeleton'
+
+// Eager — tiny, first interaction
 import { LoginPage } from '@/pages/LoginPage'
-import { DashboardPage } from '@/pages/DashboardPage'
-import { AppointmentsPage } from '@/pages/AppointmentsPage'
-import { TrucksPage } from '@/pages/TrucksPage'
-import { MotoristasPage } from '@/pages/MotoristasPage'
-import { CadastrarClientePage } from '@/pages/CadastrarClientePage'
+
+// Lazy — loaded only when the user navigates to that route
+const DashboardPage       = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
+const AppointmentsPage    = lazy(() => import('@/pages/AppointmentsPage').then(m => ({ default: m.AppointmentsPage })))
+const TrucksPage          = lazy(() => import('@/pages/TrucksPage').then(m => ({ default: m.TrucksPage })))
+const MotoristasPage      = lazy(() => import('@/pages/MotoristasPage').then(m => ({ default: m.MotoristasPage })))
+const CadastrarClientePage = lazy(() => import('@/pages/CadastrarClientePage').then(m => ({ default: m.CadastrarClientePage })))
+
+function PageFallback() {
+  return (
+    <div className="p-4 xl:p-8 space-y-4">
+      <Skeleton className="h-7 w-40" />
+      <div className="grid grid-cols-2 gap-4">
+        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24 rounded-xl" />)}
+      </div>
+      <Skeleton className="h-64 rounded-xl" />
+    </div>
+  )
+}
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false }
@@ -37,30 +54,36 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 export function App() {
   return (
     <ErrorBoundary>
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Public route — /login */}
-          <Route path="/login" element={<LoginPage />} />
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected routes — wrapped by ProtectedRoute (redirects to /login if no session) */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              {/* / → redirect to /agendamentos (D-20) */}
-              <Route index element={<Navigate to="/agendamentos" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/agendamentos" element={<AppointmentsPage />} />
-              <Route path="/caminhoes" element={<TrucksPage />} />
-              <Route path="/motoristas" element={<MotoristasPage />} />
-              <Route path="/cadastrar-cliente" element={<CadastrarClientePage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route index element={<Navigate to="/agendamentos" replace />} />
+                <Route path="/dashboard" element={
+                  <Suspense fallback={<PageFallback />}><DashboardPage /></Suspense>
+                } />
+                <Route path="/agendamentos" element={
+                  <Suspense fallback={<PageFallback />}><AppointmentsPage /></Suspense>
+                } />
+                <Route path="/caminhoes" element={
+                  <Suspense fallback={<PageFallback />}><TrucksPage /></Suspense>
+                } />
+                <Route path="/motoristas" element={
+                  <Suspense fallback={<PageFallback />}><MotoristasPage /></Suspense>
+                } />
+                <Route path="/cadastrar-cliente" element={
+                  <Suspense fallback={<PageFallback />}><CadastrarClientePage /></Suspense>
+                } />
+              </Route>
             </Route>
-          </Route>
 
-          {/* Catch-all: redirect unknown paths to /agendamentos */}
-          <Route path="*" element={<Navigate to="/agendamentos" replace />} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            <Route path="*" element={<Navigate to="/agendamentos" replace />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   )
 }

@@ -11,6 +11,7 @@ export async function fetchAppointments(): Promise<FetchAppointmentsResult> {
     .from('appointments')
     .select('*')
     .order('data_hora', { ascending: true })
+    .limit(500)
 
   if (error) {
     return { data: null, error: 'Erro ao carregar agendamentos.' }
@@ -39,16 +40,16 @@ export async function updateAppointmentStatus(
             }
           : {}
 
-  const { error, count } = await supabase
+  const { data: updated, error } = await supabase
     .from('appointments')
     .update({ status, atualizado_em: now, ...extra })
     .eq('id', id)
     .neq('status', 'concluido')
     .neq('status', 'cancelado')
-    .select('id', { count: 'exact', head: true })
+    .select('id')
 
   if (error) return { error: 'Erro ao atualizar status.' }
-  if (count === 0) return { error: 'Status final não pode ser alterado.' }
+  if (!updated || updated.length === 0) return { error: 'Status final não pode ser alterado.' }
   return { error: null }
 }
 
