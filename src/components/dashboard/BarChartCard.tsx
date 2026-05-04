@@ -6,6 +6,7 @@ import type { BarDataPoint } from '@/hooks/useDashboard'
 interface BarChartCardProps {
   data: BarDataPoint[]
   loading?: boolean
+  title?: string
 }
 
 // Custom tooltip — MUST return HTML (not SVG). v3 type: plain props object
@@ -22,12 +23,12 @@ function CustomBarTooltip({ active, payload, label }: {
   )
 }
 
-export function BarChartCard({ data, loading }: BarChartCardProps) {
+export function BarChartCard({ data, loading, title = 'Agendamentos por Mês' }: BarChartCardProps) {
   return (
     <Card className="bg-white border border-zinc-200 shadow-none">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-semibold text-zinc-900">
-          Agendamentos por Mês
+          {title}
         </CardTitle>
         <p className="text-xs text-zinc-500">Últimos 6 meses</p>
       </CardHeader>

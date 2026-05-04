@@ -1,10 +1,11 @@
-import { CalendarDays, Clock, CheckCircle2, DollarSign, Timer } from 'lucide-react'
+import { CalendarDays, Clock, CheckCircle2, DollarSign, Timer, TrendingUp } from 'lucide-react'
 import { KpiCard } from './KpiCard'
-import type { KpiData } from '@/hooks/useDashboard'
+import type { KpiData, DashboardPeriod } from '@/hooks/useDashboard'
 
 interface KpiGridProps {
   kpis: KpiData | null
   loading: boolean
+  period: DashboardPeriod
 }
 
 function formatDuracao(minutos: number | null): string {
@@ -15,15 +16,25 @@ function formatDuracao(minutos: number | null): string {
   return m > 0 ? `${h}h ${m}min` : `${h}h`
 }
 
-export function KpiGrid({ kpis, loading }: KpiGridProps) {
-  const ticketValue = kpis?.ticketMedio !== null && kpis?.ticketMedio !== undefined
-    ? `R$ ${kpis.ticketMedio}`
-    : 'R$ —'
+function formatCurrency(value: number | null): string {
+  if (value === null) return 'R$ —'
+  return `R$ ${value.toLocaleString('pt-BR')}`
+}
+
+const PERIOD_SUFFIX: Record<DashboardPeriod, string> = {
+  semana:   'na Semana',
+  mes:      'no Mês',
+  semestre: 'no Semestre',
+}
+
+export function KpiGrid({ kpis, loading, period }: KpiGridProps) {
+  const suffix = PERIOD_SUFFIX[period]
+  const ticket = kpis?.ticketMedio != null ? `R$ ${kpis.ticketMedio}` : 'R$ —'
 
   return (
     <div className="grid grid-cols-2 gap-4">
       <KpiCard
-        label="Total do Mês"
+        label={`Total ${suffix}`}
         value={loading ? '' : String(kpis?.totalMes ?? 0)}
         icon={CalendarDays}
         iconBg="bg-blue-50"
@@ -39,7 +50,7 @@ export function KpiGrid({ kpis, loading }: KpiGridProps) {
         loading={loading}
       />
       <KpiCard
-        label="Concluídos no Mês"
+        label={`Concluídos ${suffix}`}
         value={loading ? '' : String(kpis?.concluidosMes ?? 0)}
         icon={CheckCircle2}
         iconBg="bg-green-50"
@@ -48,15 +59,23 @@ export function KpiGrid({ kpis, loading }: KpiGridProps) {
       />
       <KpiCard
         label="Ticket Médio"
-        value={loading ? '' : ticketValue}
+        value={loading ? '' : ticket}
         icon={DollarSign}
         iconBg="bg-violet-50"
         iconColor="text-violet-600"
         loading={loading}
       />
-      <div className="col-span-2">
+      <KpiCard
+        label={`Faturamento ${suffix}`}
+        value={loading ? '' : formatCurrency(kpis?.faturamentoTotal ?? null)}
+        icon={TrendingUp}
+        iconBg="bg-emerald-50"
+        iconColor="text-emerald-600"
+        loading={loading}
+      />
+      <div className="col-span-1">
         <KpiCard
-          label="Duração Média do Serviço"
+          label="Duração Média"
           value={loading ? '' : formatDuracao(kpis?.duracaoMedia ?? null)}
           icon={Timer}
           iconBg="bg-orange-50"
