@@ -26,7 +26,7 @@ const schema = z.object({
   nome: z.string().min(2, 'Nome obrigatório.'),
   whatsapp: z.string().min(10, 'WhatsApp deve ter pelo menos 10 dígitos.'),
   endereco: z.string().min(5, 'Endereço obrigatório.'),
-  servico: z.enum(SERVICOS, { errorMap: () => ({ message: 'Selecione um serviço.' }) }),
+  servico: z.enum(SERVICOS, { message: 'Selecione um serviço.' }),
   data_hora: z.string().min(1, 'Data e hora obrigatórias.'),
   notas: z.string().optional(),
 })

@@ -43,7 +43,7 @@ export function RankingChartCard({ title, data, loading, emptyMessage = 'Sem dad
                 axisLine={false}
               />
               <Tooltip
-                formatter={(value: number) => [value, 'Serviços']}
+                formatter={(value: unknown) => [Number(value), 'Serviços']}
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e4e4e7' }}
                 cursor={{ fill: '#f4f4f5' }}
               />
