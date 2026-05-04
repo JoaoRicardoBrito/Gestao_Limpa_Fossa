@@ -39,12 +39,17 @@ export async function updateAppointmentStatus(
             }
           : {}
 
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from('appointments')
     .update({ status, atualizado_em: now, ...extra })
     .eq('id', id)
+    .neq('status', 'concluido')
+    .neq('status', 'cancelado')
+    .select('id', { count: 'exact', head: true })
 
-  return { error: error ? 'Erro ao atualizar status.' : null }
+  if (error) return { error: 'Erro ao atualizar status.' }
+  if (count === 0) return { error: 'Status final não pode ser alterado.' }
+  return { error: null }
 }
 
 export async function completeAppointment(

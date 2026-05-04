@@ -15,7 +15,12 @@ interface StatusSelectProps {
   onCompleteRequest?: () => void
 }
 
+const TERMINAL_STATES: AppointmentStatus[] = ['concluido', 'cancelado']
+
 export function StatusSelect({ value, onChange, onCancelRequest, onStartRequest, onCompleteRequest }: StatusSelectProps) {
+  // Terminal states cannot be changed — hide the select entirely to prevent any transition
+  if (TERMINAL_STATES.includes(value)) return null
+
   return (
     <select
       value={value}
@@ -34,7 +39,7 @@ export function StatusSelect({ value, onChange, onCancelRequest, onStartRequest,
       className="text-xs border border-zinc-200 rounded px-2 py-1 bg-white text-zinc-700 cursor-pointer hover:border-zinc-400 transition-colors"
       aria-label="Mudar status"
     >
-      {STATUS_OPTIONS.map(opt => (
+      {STATUS_OPTIONS.filter(opt => !TERMINAL_STATES.includes(opt.value)).map(opt => (
         <option key={opt.value} value={opt.value}>
           {opt.label}
         </option>

@@ -24,10 +24,12 @@ const SERVICOS = [
 
 const schema = z.object({
   nome: z.string().min(2, 'Nome obrigatório.'),
-  whatsapp: z.string().min(10, 'WhatsApp deve ter pelo menos 10 dígitos.'),
+  whatsapp: z.string().regex(/^\(?\d{2}\)?[\s\-]?\d{4,5}[\s\-]?\d{4}$/, 'WhatsApp inválido. Ex: (86) 99999-0000'),
   endereco: z.string().min(5, 'Endereço obrigatório.'),
   servico: z.enum(SERVICOS, { message: 'Selecione um serviço.' }),
-  data_hora: z.string().min(1, 'Data e hora obrigatórias.'),
+  data_hora: z.string()
+    .min(1, 'Data e hora obrigatórias.')
+    .refine(v => new Date(v).getTime() > Date.now(), 'A data e hora devem ser futuras.'),
   notas: z.string().optional(),
 })
 

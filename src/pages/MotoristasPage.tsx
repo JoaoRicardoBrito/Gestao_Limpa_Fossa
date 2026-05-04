@@ -24,7 +24,8 @@ export function MotoristasPage() {
     return () => { cancelled = true }
   }, [motoristas.length])
 
-  const canSubmit = nome.trim().length >= 2 && telefone.trim().length >= 2
+  const phoneValid = /^\(?\d{2}\)?[\s\-]?\d{4,5}[\s\-]?\d{4}$/.test(telefone.trim())
+  const canSubmit = nome.trim().length >= 2 && phoneValid
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
